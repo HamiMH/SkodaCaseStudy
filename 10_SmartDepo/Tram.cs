@@ -1,5 +1,8 @@
 ﻿namespace _10_SmartDepo;
 
+/// <summary>
+/// Tram representation
+/// /// </summary>
 public partial class Tram
 {
 	//Tram should be created by TramFactory

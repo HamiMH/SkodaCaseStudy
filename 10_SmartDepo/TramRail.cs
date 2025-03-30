@@ -1,26 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using static _10_SmartDepo.Tram;
+﻿using static _10_SmartDepo.Tram;
 
 namespace _10_SmartDepo
 {
 	/// <summary>
 	/// Represents a tram rail
+	/// Trail is represented by two queues, one for trams with mission and one for trams without mission
 	/// </summary>
 	public class TramRail
 	{
-		private Random _random = new Random();
-		private SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
 
 		private Queue<Tram> _withMission = new Queue<Tram>();
 		private Queue<Tram> _withoutMission = new Queue<Tram>();
 		private TramFactory _tramFactory;
 
 
+		private Random _random = new Random();
+		private SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
+
+		public TramRail(TramFactory tramFactory)
+		{
+			_tramFactory = tramFactory;
+		}
+		/// <summary>
+		/// Initialize tram rail with trams
+		/// </summary>
+		/// <param name="numberOfTramsWithMission"></param>
+		/// <param name="numberOfTramsWithoutMission"></param>
 		public void InitializeTramRail(int numberOfTramsWithMission, int numberOfTramsWithoutMission)
 		{
 			_withMission.Clear();
@@ -34,12 +39,9 @@ namespace _10_SmartDepo
 				_withoutMission.Enqueue(_tramFactory.CreateTram("Tram without mission"));
 			}
 		}
-
-		public TramRail(TramFactory tramFactory)
-		{
-			_tramFactory = tramFactory;
-		}
-
+		/// <summary>
+		/// Functioons for basic operations on tram rail
+		/// </summary>
 		private void AddNewTram()
 		{
 			_withoutMission.Enqueue(_tramFactory.CreateTram("Tram without mission"));
@@ -67,6 +69,10 @@ namespace _10_SmartDepo
 			return true;
 		}
 
+		/// <summary>
+		/// Async functions for basic operations on tram rail
+		/// </summary>
+		/// <returns></returns>
 		public async Task AddNewTramAsync()
 		{
 			await _semaphore.WaitAsync();
@@ -145,6 +151,10 @@ namespace _10_SmartDepo
 			}
 		}
 
+		/// <summary>
+		/// Enumarotors for tram rail queues
+		/// </summary>
+		/// <returns></returns>
 		public IEnumerable<Tram> GetTramsWithMission()
 		{
 			return _withMission.AsEnumerable();

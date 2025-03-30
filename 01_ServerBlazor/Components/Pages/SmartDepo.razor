@@ -50,7 +50,7 @@
 
 <WaitingModal IsVisible="_isLoading" IsVisibleChanged="WaitingVisibilityChanged" />
 
-<TramRailUi Trams="TramRail.GetAllTrams().Reverse().ToList()" />
+<TramRailUi TramRail="TramRail" />
 
 @code {
 	private bool _isModalVisible = false;
@@ -135,7 +135,6 @@
 	{
 		_isLoading = true;
 		RouteMission routeMission = new RouteMission(_idOfMission);
-
 		bool isTramPlaned = await TramRail.SetMissionForTram5sAsync(routeMission);
 		_isLoading = false;
 		if (!isTramPlaned)
