@@ -1,0 +1,53 @@
+﻿@page "/tramlist"
+@using _10_SmartDepo
+
+<h3>Tram rail</h3>
+
+<div class="tram-list">
+    @foreach (var tram in Trams)
+    {
+        <div class="tram" style="background-color: @GetTramColor(tram)" @onclick="() => ShowTramInfo(tram)">
+            <span class="tram-id">@tram.Id</span>
+        </div>
+    }
+</div>
+<div style="height: 50px;"></div>
+<button @onclick="Refresh" style="margin-bottom: 20px;">Refresh</button>
+<div style="height: 50px;"></div>
+
+@if (selectedTram != null)
+{
+    <div class="tram-info">
+        <h4>Tram Info</h4>
+        <p>Name: @selectedTram.Name</p>
+        <p>ID: @selectedTram.Id</p>
+        <p>Has Mission: @selectedTram.HasMission</p>
+        @if (selectedTram.Mission != null)
+        {
+            <p>Mission ID: @selectedTram.Mission.Id</p>
+        }
+    </div>
+}
+
+@code {
+    [Parameter]
+    public List<Tram> Trams { get; set; }
+
+    private Tram selectedTram;
+
+    private void ShowTramInfo(Tram tram)
+    {
+        selectedTram = tram;
+    }
+
+    private string GetTramColor(Tram tram)
+    {
+        return tram.HasMission ? "lightblue" : "lightgreen";
+    }
+    public void Refresh()
+    {
+        StateHasChanged();
+    }
+
+
+}

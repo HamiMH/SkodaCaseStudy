@@ -1,0 +1,24 @@
+﻿@* Components/Element/ModalDialog.razor *@
+<div class="modalCentered" style="@(IsVisible ? "display:flex;" : "display:none;")">
+    <div class="modalCentered-content">
+        <span class="close" @onclick="CloseModal">&times;</span>
+        @ChildContent
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public bool IsVisible { get; set; }
+
+    [Parameter]
+    public EventCallback<bool> IsVisibleChanged { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    private void CloseModal()
+    {
+        IsVisible = false;
+        IsVisibleChanged.InvokeAsync(IsVisible);
+    }
+}

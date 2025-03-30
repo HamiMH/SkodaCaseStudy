@@ -1,0 +1,147 @@
+﻿@page "/"
+@using _01_ServerBlazor.Components.Element
+@using _10_SmartDepo
+@rendermode InteractiveServer
+
+<h3>Smart depo</h3>
+
+<div class="form-container">
+	<div class="form-group">
+		<label for="_numberOfTramsWithMission">Number of trams with mission:</label>
+		<input type="number" id="numWithMission" @bind="_numberOfTramsWithMission" />
+	</div>
+	<div class="form-group">
+		<label for="_numberOfTramsWithoutMission">Number of trams without mission:</label>
+		<input type="number" id="numWithoutMission" @bind="_numberOfTramsWithoutMission" />
+	</div>
+	<div class="form-group">
+		<button @onclick="InitialTramRail" style="margin-bottom: 20px;">Initialize rail</button>
+	</div>
+</div>
+
+<div style="height: 50px;"></div>
+
+<div class="form-container">
+	<div >
+		<label width for="_idOfMission">Mission id:</label>
+		<input type="number" id="idOFMission" @bind="_idOfMission" />
+	</div>
+	<div class="form-group">
+		<button @onclick="PlanMissionOneTram" style="margin-bottom: 20px;">Plan mission</button>
+		<button @onclick="PlanMissionOneTram5s" style="margin-bottom: 20px;">Plan mission (5s)</button>
+	</div>
+	<div class="form-group">
+		<button @onclick="AddOneNewTram" style="margin-bottom: 20px;">Add new tram</button>
+		<button @onclick="AddOneNewTram5s" style="margin-bottom: 20px;">Add new tram (5s)</button>
+	</div>
+	<div class="form-group">
+		<button @onclick="SendOutOneTram" style="margin-bottom: 20px;">Send first tram</button>
+		<button @onclick="SendOutOneTram5s" style="margin-bottom: 20px;">Send first tram (5s)</button>
+	</div>
+</div>
+
+<div style="height: 50px;"></div>
+
+
+<ModalDialog IsVisible="_isModalVisible" IsVisibleChanged="OnModalVisibilityChanged">
+	<h2>No tram</h2>
+	<p>@_modalDialog</p>
+</ModalDialog>
+
+<WaitingModal IsVisible="_isLoading" IsVisibleChanged="WaitingVisibilityChanged" />
+
+<TramRailUi Trams="TramRail.GetAllTrams().Reverse().ToList()" />
+
+@code {
+	private bool _isModalVisible = false;
+	private bool _isLoading = false;
+	private int _numberOfTramsWithMission;
+	private int _numberOfTramsWithoutMission;
+	private int _idOfMission;
+	private string _modalDialog = "";
+
+	[Inject]
+	private TramRail TramRail { get; set; }
+
+
+	public void InitialTramRail()
+	{
+		TramRail.InitializeTramRail(_numberOfTramsWithMission, _numberOfTramsWithoutMission);
+	}
+
+	private void OnModalVisibilityChanged(bool isVisible)
+	{
+		_isModalVisible = isVisible;
+	}
+
+	private void WaitingVisibilityChanged(bool isLoading)
+	{
+		_isLoading = isLoading;
+	}
+
+
+	private async Task AddOneNewTram(MouseEventArgs args)
+	{
+		_isLoading = true;
+		await TramRail.AddNewTramAsync();
+		_isLoading = false;
+	}
+
+	private async Task SendOutOneTram(MouseEventArgs args)
+	{
+		_isLoading = true;
+		bool isTramSent = await TramRail.SendTramAsync();
+		_isLoading = false;
+		if (!isTramSent)
+		{
+			_modalDialog = "There is no tram with mission to send.";
+			_isModalVisible = true;
+		}
+	}
+
+	private async Task PlanMissionOneTram(MouseEventArgs args)
+	{
+		_isLoading = true;
+		RouteMission routeMission = new RouteMission(_idOfMission);
+		bool isTramPlaned = await TramRail.SetMissionForTramAsync(routeMission);
+		_isLoading = false;
+		if (!isTramPlaned)
+		{
+			_modalDialog = "There is no tram without mission to set up.";
+			_isModalVisible = true;
+		}
+	}
+
+	private async Task AddOneNewTram5s(MouseEventArgs args)
+	{
+		_isLoading = true;
+		await TramRail.AddNewTram5sAsync();
+		_isLoading = false;
+	}
+
+	private async Task SendOutOneTram5s(MouseEventArgs args)
+	{
+		_isLoading = true;
+		bool isTramSent = await TramRail.SendTram5sAsync();
+		_isLoading = false;
+		if (!isTramSent)
+		{
+			_modalDialog = "There is no tram with mission to send.";
+			_isModalVisible = true;
+		}
+	}
+
+	private async Task PlanMissionOneTram5s(MouseEventArgs args)
+	{
+		_isLoading = true;
+		RouteMission routeMission = new RouteMission(_idOfMission);
+
+		bool isTramPlaned = await TramRail.SetMissionForTram5sAsync(routeMission);
+		_isLoading = false;
+		if (!isTramPlaned)
+		{
+			_modalDialog = "There is no tram without mission to set up.";
+			_isModalVisible = true;
+		}
+	}
+}
